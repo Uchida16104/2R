@@ -1,0 +1,51 @@
+---
+title: 2R System Architecture
+---
+
+graph TD
+    Client["Frontend\nVue 3 + HTMX + Alpine.js + Hyperscript\nTailwind CSS"]
+    LocalDB[("Offline Storage\nPouchDB / IndexedDB\nSQL.js / localStorage")]
+    Nginx["Nginx\nReverse Proxy :80"]
+    Laravel["Laravel 11\nAPI Gateway & Orchestrator\n:9000 PHP-FPM"]
+    MainDB[("PostgreSQL 16\nAuthoritative Store\n:5432")]
+    AuthRust["auth_rust\nAxum / Rust\nAvailability :3001"]
+    BookingNet["booking_dotnet\nASP.NET 8 / C#\nEnterprise Calendar :5001"]
+    VerifyDafny["verify_dafny\nDafny + Python Bridge\nFormal Verification :3002"]
+    AnalyticsPy["analytics_python\nFastAPI / asyncpg\nUsage & Forecast :8001"]
+    PerfCpp["perf_cpp\nC++20 Raw Sockets\nSlot Resolver :9001"]
+    SysZig["sys_zig\nZig 0.13\nSystem Validator :9002"]
+    AiMojo["ai_mojo\nMojo / Python fallback\nAI Forecast :8002"]
+    FormalFstar["formal_fstar\nF* Proof Spec\n(Offline Verification)"]
+    LegacyGas["legacy_gas\nGoogle Apps Script\nCalendar Sync"]
+    LegacyVba["legacy_vba\nVBA / Office COM\nExcel Sync"]
+
+    Client -->|"HTTPS REST"| Nginx
+    Client <-->|"Offline Queue"| LocalDB
+    LocalDB -.->|"Eventual Consistency\non reconnect"| Laravel
+    Nginx --> Laravel
+    Laravel <--> MainDB
+    Laravel -->|"Availability check"| AuthRust
+    AuthRust <--> MainDB
+    Laravel -->|"Enterprise calendar"| BookingNet
+    BookingNet <--> MainDB
+    Laravel -->|"Invariant proof"| VerifyDafny
+    Laravel -->|"Usage analytics"| AnalyticsPy
+    AnalyticsPy <--> MainDB
+    Laravel -->|"Slot resolution"| PerfCpp
+    Laravel -->|"Field validation"| SysZig
+    Laravel -->|"AI forecast"| AiMojo
+    FormalFstar -.->|"Spec used by"| VerifyDafny
+    LegacyGas -->|"POST /api/reservations"| Nginx
+    LegacyVba -->|"POST /api/reservations"| Nginx
+
+    style Client       fill:#1e1e2e,stroke:#5b5ef4,color:#e8e8f0
+    style LocalDB      fill:#1e1e2e,stroke:#f4a135,color:#e8e8f0
+    style Laravel      fill:#1e1e2e,stroke:#22d3a0,color:#e8e8f0
+    style MainDB       fill:#1e1e2e,stroke:#22d3a0,color:#e8e8f0
+    style AuthRust     fill:#1e1e2e,stroke:#f45b5b,color:#e8e8f0
+    style BookingNet   fill:#1e1e2e,stroke:#5b5ef4,color:#e8e8f0
+    style VerifyDafny  fill:#1e1e2e,stroke:#7b7ef8,color:#e8e8f0
+    style AnalyticsPy  fill:#1e1e2e,stroke:#f4a135,color:#e8e8f0
+    style PerfCpp      fill:#1e1e2e,stroke:#f45b5b,color:#e8e8f0
+    style SysZig       fill:#1e1e2e,stroke:#22d3a0,color:#e8e8f0
+    style AiMojo       fill:#1e1e2e,stroke:#7b7ef8,color:#e8e8f0
