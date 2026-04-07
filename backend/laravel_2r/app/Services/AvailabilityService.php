@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 
 class AvailabilityService
+{
     private string $rustServiceUrl;
 
     public function __construct()
@@ -84,6 +85,7 @@ class AvailabilityService
         });
     }
 
+    private function computeAvailabilityFallback(string $date): array
     {
         $rooms = Reservation::active()
             ->whereDate('start_time', $date)
