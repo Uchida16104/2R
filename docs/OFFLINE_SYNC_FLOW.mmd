@@ -1,0 +1,38 @@
+---
+title: 2R Offline Sync Flow
+---
+
+sequenceDiagram
+    participant U  as User
+    participant FE as Vue Frontend
+    participant PD as PouchDB (Local)
+    participant LS as localStorage
+    participant LV as Laravel API
+    participant DB as PostgreSQL
+
+    U->>FE: Create reservation (offline)
+    FE->>PD: persist(reservation, synced=false)
+    FE->>LS: store token & user
+    FE-->>U: Queued — will sync when online
+
+    Note over FE,LV: Network restored
+
+    FE->>LV: POST /api/reservations/sync [batch]
+    LV->>DB: BEGIN TRANSACTION
+    LV->>DB: SELECT overlapping slots (FOR UPDATE)
+
+    alt No conflict
+        DB-->>LV: Slot available
+        LV->>DB: INSERT reservation (status=confirmed)
+        DB-->>LV: id assigned
+        LV->>DB: COMMIT
+        LV-->>FE: {status: created, id: N}
+        FE->>PD: update(synced=true, id=N)
+        FE-->>U: Confirmed
+    else Conflict detected
+        DB-->>LV: Overlap exists
+        LV->>DB: ROLLBACK
+        LV-->>FE: {status: conflict}
+        FE->>PD: update(status=cancelled)
+        FE-->>U: Booking conflict — cancelled
+    end

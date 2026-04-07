@@ -1,0 +1,29 @@
+---
+title: 2R Booking Request Lifecycle
+---
+
+flowchart TD
+    A([Client: POST /api/reservations]) --> B{Online?}
+    B -->|No| C[PouchDB: save pending]
+    C --> D([Return: queued])
+
+    B -->|Yes| E[Laravel: validate fields]
+    E --> F{Valid?}
+    F -->|No| G([422 Validation Error])
+
+    F -->|Yes| H[Zig: validate field types]
+    H --> I{Zig OK?}
+    I -->|No| J([400 Bad Request])
+
+    I -->|Yes| K[Dafny Bridge: verify slot invariant]
+    K --> L{Invariant holds?}
+    L -->|No| M([409 Invariant Violation])
+
+    L -->|Yes| N[DB: SELECT overlapping FOR UPDATE]
+    N --> O{Overlap?}
+    O -->|Yes| P([409 Conflict])
+
+    O -->|No| Q[C++ perf: resolve slot in memory]
+    Q --> R[DB: INSERT reservation]
+    R --> S[Rust: cache availability update]
+    S --> T([201 Created])
