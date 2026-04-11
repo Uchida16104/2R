@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import DashboardView from '@/views/DashboardView.vue'
-import LoginView from '@/views/LoginView.vue'
-import ReservationsView from '@/views/ReservationsView.vue'
-import AvailabilityView from '@/views/AvailabilityView.vue'
-import AnalyticsView from '@/views/AnalyticsView.vue'
+import DashboardView from '@/components/DashboardView.vue'
+import LoginView from '@/components/LoginView.vue'
+import ReservationsView from '@/components/ReservationsView.vue'
+import AvailabilityView from '@/components/AvailabilityView.vue'
+import AnalyticsView from '@/components/AnalyticsView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
